@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - PixApp</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
+        <h2 class="text-3xl font-bold text-center text-emerald-400 mb-2">PixApp</h2>
+        <p class="text-slate-400 text-center mb-6 text-sm">Acesse sua conta bancária</p>
+
+        
+        <form id="formLogin" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">E-mail</label>
+                <input type="email" id="email" required placeholder="seu@email.com"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Senha</label>
+                <input type="password" id="password" required placeholder="••••••••"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <button type="submit"
+                class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-lg transition mt-6 shadow-lg shadow-emerald-500/20">
+                Entrar na Conta
+            </button>
+        </form>
+
+        <div class="text-center mt-6 text-sm text-slate-400">
+            Ainda não tem conta? <a href="cadastro.html" class="text-emerald-400 hover:underline">Cadastre-se</a>
+        </div>
+    </div>
+
+    
+    <script>
+        document.getElementById('formLogin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                
+                const response = await fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('usuarioLogado', JSON.stringify(data));
+
+                    alert('Login realizado com sucesso!');
+                    window.location.href = './dashboard.html'; 
+                } else {
+                    alert('Erro ao entrar: ' + (data.error || data.message || 'Credenciais inválidas.'));
+                }
+            } catch (error) {
+                console.error('Erro ao conectar com a API:', error);
+                alert('Erro ao conectar com o servidor back-end.');
+            }
+        });
+    </script>
+</body>
+
+</html>
