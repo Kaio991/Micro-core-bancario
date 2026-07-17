@@ -2,17 +2,20 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database.js';
 
 export class ModelUser extends Model {
-    public id!: string;
-    public name!: string;
-    public email!: string;
-    public password!: string;
-    public balance!: number;
-    public transactionPi!: string;
-    public pinAttempts!:number;
-    public lockUntil!: Date
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
+    //  JEITO CERTO (Usando 'declare')
+    declare id: string;
+    declare name: string;
+    declare email: string;
+    declare password?: string; 
+    declare transactionPi: string;
+    declare balance: number;
+    declare pinAttempts: number;
+    declare lockUntil: Date | null;
+    declare createdAt: Date;
+    declare updatedAt: Date;
 }
+
+
 
 ModelUser.init(
     {

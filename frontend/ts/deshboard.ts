@@ -135,10 +135,10 @@ if (formPix) {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    receiverEmail: destinatario, // Mapeado para o controller do back-end
-                    amount: Number(valor),       // Mapeado para o controller do back-end
-                    description: 'Transferência Pix', // Descrição padrão ou opcional
-                    transactionPin: senha        // Mapeado para o controller do back-end
+                    receiverEmail: destinatario,
+                    amount: Number(valor),
+                    description: 'Transferência Pix',
+                    transactionPin: senha
                 })
             });
 
@@ -147,7 +147,6 @@ if (formPix) {
             if (response.ok) {
                 alert('💸 Pix enviado com sucesso!');
 
-                // Calcula o novo saldo subtraindo o valor enviado, já que o back-end atualizou lá
                 const saldoAtual = objetoUsuario.user?.balance !== undefined ? objetoUsuario.user.balance : (objetoUsuario.balance || 0);
                 const novoSaldo = Number(saldoAtual) - Number(valor);
 
@@ -159,7 +158,6 @@ if (formPix) {
                 formPix.reset();
                 if (btnFecharPix) btnFecharPix.click();
             } else {
-                // Seu controller manda o erro na propriedade ".error"
                 alert('Erro ao realizar Pix: ' + (data.error || 'Erro desconhecido.'));
             }
         } catch (error) {
@@ -168,7 +166,7 @@ if (formPix) {
     });
 }
 
-// 6. Fetch: Carregar Extrato
+// 6. Fetch: Carregar Extrato (Corrigido e Blindado)
 async function carregarExtrato(): Promise<void> {
     if (!listaTransacoes) return;
 
@@ -177,6 +175,7 @@ async function carregarExtrato(): Promise<void> {
 
     const objetoUsuario = JSON.parse(dadosSalvos);
     const token = objetoUsuario.token;
+    const currentUserId: string | undefined = objetoUsuario.user?.id || objetoUsuario.id;
 
     listaTransacoes.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Buscando transações...</p>';
 
@@ -190,24 +189,37 @@ async function carregarExtrato(): Promise<void> {
 
         const data = await response.json();
 
-        if (response.ok && data.transactions && data.transactions.length > 0) {
+        if (response.ok && data.transacoes && data.transacoes.length > 0) {
             listaTransacoes.innerHTML = '';
 
-            data.transactions.forEach((itemTransacao: any) => {
+            data.transacoes.forEach((itemTransacao: any) => {
                 const itemElemento = document.createElement('div');
-                itemElemento.className = 'flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-700/50';
+                itemElemento.className = 'flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-700/50 my-2';
 
-                const IsPositive = itemTransacao.type === 'deposito' || itemTransacao.type === 'pix_recebido';
-                const corValor = IsPositive ? 'text-emerald-400' : 'text-rose-400';
-                const sinal = IsPositive ? '+' : '-';
+                // Tratamento seguro convertendo os IDs de UUID para string limpa e minúscula
+                const idRemetente = String(itemTransacao.senderId).trim().toLowerCase();
+                const idLogado = String(currentUserId).trim().toLowerCase();
+
+                const isEnviado = idRemetente === idLogado;
+                const rotulo = isEnviado ? 'Pix Enviado' : 'Pix Recebido';
+
+                // Fallbacks seguros caso os includes do Sequelize falhem ou venham vazios
+                const nomeSender = itemTransacao.Sender?.name || 'Usuário Desconhecido';
+                const nomeReceiver = itemTransacao.Receiver?.name || 'Usuário Desconhecido';
+                const contraparte = isEnviado ? nomeReceiver : nomeSender;
+
+                const corValor = isEnviado ? 'text-rose-400' : 'text-emerald-400';
+                const sinal = isEnviado ? '-' : '+';
+                const valor = Number(itemTransacao.amount);
 
                 itemElemento.innerHTML = `
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wide text-white">${itemTransacao.type.replace('_', ' ')}</p>
-                        <p class="text-[10px] text-slate-400">${new Date(itemTransacao.createdAt).toLocaleDateString('pt-BR')}</p>
+                        <p class="text-xs font-bold uppercase tracking-wide text-white">${rotulo}</p>
+                        <p class="text-[10px] text-slate-400">${isEnviado ? 'para' : 'de'} ${contraparte}</p>
+                        <p class="text-[10px] text-slate-500">${new Date(itemTransacao.createdAt).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-black ${corValor}">${sinal} R$ ${itemTransacao.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p class="text-sm font-black ${corValor}">${sinal} R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                 `;
                 listaTransacoes.appendChild(itemElemento);

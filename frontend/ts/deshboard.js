@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,60 +8,66 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// 2. Evento inicial ao carregar o DOM
-document.addEventListener('DOMContentLoaded', () => {
-    const dadosSalvos = localStorage.getItem('usuarioLogado');
-    if (!dadosSalvos) {
-        alert('Acesso negado. Por favor, faça login primeiro!');
-        window.location.href = './login.html';
-        return;
-    }
-    atualizarTela();
-});
-// 3. Função para atualizar os dados na tela com segurança
-function atualizarTela() {
-    var _a, _b, _c, _d, _e;
-    const dadosSalvos = localStorage.getItem('usuarioLogado');
-    if (!dadosSalvos)
-        return;
-    const objetoUsuario = JSON.parse(dadosSalvos);
-    const nome = objetoUsuario.name || ((_a = objetoUsuario.user) === null || _a === void 0 ? void 0 : _a.name) || "Usuário";
-    const saldo = objetoUsuario.balance !== undefined ? objetoUsuario.balance :
-        (objetoUsuario.saldo !== undefined ? objetoUsuario.saldo :
-            ((_e = (_c = (_b = objetoUsuario.user) === null || _b === void 0 ? void 0 : _b.balance) !== null && _c !== void 0 ? _c : (_d = objetoUsuario.user) === null || _d === void 0 ? void 0 : _d.saldo) !== null && _e !== void 0 ? _e : 0));
-    const elemNome = document.getElementById('nomeUsuario');
-    const elemSaldo = document.getElementById('saldoUsuario');
-    if (elemNome)
-        elemNome.innerText = nome;
-    if (elemSaldo)
-        elemSaldo.innerText = Number(saldo).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-}
-// 4. Botão Sair
-const btnSair = document.getElementById('btnSair');
-if (btnSair) {
-    btnSair.addEventListener('click', () => {
-        localStorage.removeItem('usuarioLogado');
-        window.location.href = './login.html';
-    });
-}
-// 5. Controles do Modal de Depósito
+// 1. Elementos da Interface Principal
+const nomeUsuario = document.getElementById('nomeUsuario');
+const saldoUsuario = document.getElementById('saldoUsuario');
+const btnLogout = document.getElementById('btnLogout');
+const btnConfig = document.getElementById('btnConfig');
+// Modais e Controles
 const modalDeposito = document.getElementById('modalDeposito');
 const btnAbrirDeposito = document.getElementById('btnAbrirDeposito');
 const btnFecharDeposito = document.getElementById('btnFecharDeposito');
 const formDeposito = document.getElementById('formDeposito');
-if (btnAbrirDeposito && modalDeposito) {
-    btnAbrirDeposito.addEventListener('click', () => modalDeposito.classList.remove('hidden'));
+const modalPix = document.getElementById('modalPix');
+const btnAbrirPix = document.getElementById('btnAbrirPix');
+const btnFecharPix = document.getElementById('btnFecharPix');
+const formPix = document.getElementById('formPix');
+const modalExtrato = document.getElementById('modalExtrato');
+const btnAbrirExtrato = document.getElementById('btnAbrirExtrato');
+const btnFecharExtrato = document.getElementById('btnFecharExtrato');
+const listaTransacoes = document.getElementById('listaTransacoes');
+// 2. Função de Controle de Visibilidade dos Modais
+function toggleModal(modal) {
+    if (!modal)
+        return;
+    modal.classList.toggle('opacity-0');
+    modal.classList.toggle('pointer-events-none');
+    document.body.classList.toggle('modal-active');
 }
-if (btnFecharDeposito && modalDeposito && formDeposito) {
-    btnFecharDeposito.addEventListener('click', () => {
-        modalDeposito.classList.add('hidden');
-        formDeposito.reset();
+if (btnAbrirDeposito)
+    btnAbrirDeposito.addEventListener('click', () => toggleModal(modalDeposito));
+if (btnFecharDeposito)
+    btnFecharDeposito.addEventListener('click', () => toggleModal(modalDeposito));
+if (btnAbrirPix)
+    btnAbrirPix.addEventListener('click', () => toggleModal(modalPix));
+if (btnFecharPix)
+    btnFecharPix.addEventListener('click', () => toggleModal(modalPix));
+if (btnAbrirExtrato)
+    btnAbrirExtrato.addEventListener('click', () => {
+        toggleModal(modalExtrato);
+        carregarExtrato();
     });
+if (btnFecharExtrato)
+    btnFecharExtrato.addEventListener('click', () => toggleModal(modalExtrato));
+// 3. Atualizar Dados na Tela do Dashboard
+function atualizarTela() {
+    var _a, _b;
+    const dadosSalvos = localStorage.getItem('usuarioLogado');
+    if (!dadosSalvos) {
+        window.location.href = 'login.html';
+        return;
+    }
+    const objetoUsuario = JSON.parse(dadosSalvos);
+    const nome = ((_a = objetoUsuario.user) === null || _a === void 0 ? void 0 : _a.name) || objetoUsuario.name || 'Usuário';
+    const saldo = ((_b = objetoUsuario.user) === null || _b === void 0 ? void 0 : _b.balance) !== undefined ? objetoUsuario.user.balance : (objetoUsuario.balance || 0);
+    if (nomeUsuario)
+        nomeUsuario.innerText = nome;
+    if (saldoUsuario)
+        saldoUsuario.innerText = saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-// 6. Fetch: Realizar Depósito
+// 4. Fetch: Realizar Depósito
 if (formDeposito) {
     formDeposito.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
         e.preventDefault();
         const inputValor = document.getElementById('valorDeposito');
         const dadosSalvos = localStorage.getItem('usuarioLogado');
@@ -70,7 +77,7 @@ if (formDeposito) {
         const objetoUsuario = JSON.parse(dadosSalvos);
         const token = objetoUsuario.token;
         try {
-            const response = yield fetch('http://localhost:3000/auth/deposito', {
+            const response = yield fetch('http://localhost:3000/transfer/deposito', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -78,21 +85,22 @@ if (formDeposito) {
                 },
                 body: JSON.stringify({ amount: Number(amount) })
             });
-            const data = (yield response.json());
+            const data = yield response.json();
             if (response.ok) {
                 alert('💰 Depósito efetuado com sucesso!');
-                const novoSaldo = data.saldoAtualizado || data.saldo || ((_a = data.user) === null || _a === void 0 ? void 0 : _a.balance) || 0;
+                const novoSaldo = data.saldoAtualizado || data.saldo || data.novoSaldo || 0;
                 if (objetoUsuario.user)
                     objetoUsuario.user.balance = novoSaldo;
                 else
                     objetoUsuario.balance = novoSaldo;
                 localStorage.setItem('usuarioLogado', JSON.stringify(objetoUsuario));
                 atualizarTela();
+                formDeposito.reset();
                 if (btnFecharDeposito)
                     btnFecharDeposito.click();
             }
             else {
-                alert('Erro no depósito: ' + (data.message || data.error));
+                alert('Erro no depósito: ' + (data.error || data.message));
             }
         }
         catch (error) {
@@ -100,61 +108,57 @@ if (formDeposito) {
         }
     }));
 }
-// 7. Controles do Modal de Pix
-const modalPix = document.getElementById('modalPix');
-const btnAbrirPix = document.getElementById('btnAbrirPix');
-const btnFecharPix = document.getElementById('btnFecharPix');
-const formPix = document.getElementById('formPix');
-if (btnAbrirPix && modalPix) {
-    btnAbrirPix.addEventListener('click', () => modalPix.classList.remove('hidden'));
-}
-if (btnFecharPix && modalPix && formPix) {
-    btnFecharPix.addEventListener('click', () => {
-        modalPix.classList.add('hidden');
-        formPix.reset();
-    });
-}
-// 8. Fetch: Enviar Pix
+// 5. Fetch: Enviar Pix (Sincronizado perfeitamente com as chaves do seu Controller)
 if (formPix) {
     formPix.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         e.preventDefault();
         const inputDestinatario = document.getElementById('destinatarioPix');
         const inputValorPix = document.getElementById('valorPix');
+        const inputSenhaPix = document.getElementById('senhaPix');
         const dadosSalvos = localStorage.getItem('usuarioLogado');
-        if (!inputDestinatario || !inputValorPix || !dadosSalvos)
+        if (!inputDestinatario || !inputValorPix || !inputSenhaPix || !dadosSalvos)
             return;
-        const destinatario = inputDestinatario.value;
+        const destinatario = inputDestinatario.value.trim();
         const valor = inputValorPix.value;
+        const senha = inputSenhaPix.value.trim();
+        if (senha.length !== 4) {
+            alert('A senha transacional deve conter exatamente 4 dígitos.');
+            return;
+        }
         const objetoUsuario = JSON.parse(dadosSalvos);
         const token = objetoUsuario.token;
         try {
-            const response = yield fetch('http://localhost:3000/auth/pix', {
+            const response = yield fetch('http://localhost:3000/transfer/pix', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    para: destinatario,
-                    valor: Number(valor)
+                    receiverEmail: destinatario,
+                    amount: Number(valor),
+                    description: 'Transferência Pix',
+                    transactionPin: senha
                 })
             });
-            const data = (yield response.json());
+            const data = yield response.json();
             if (response.ok) {
-                alert('⚡ Pix enviado com sucesso!');
-                const novoSaldo = data.novoSaldo || data.saldo || ((_a = data.user) === null || _a === void 0 ? void 0 : _a.balance) || 0;
+                alert('💸 Pix enviado com sucesso!');
+                const saldoAtual = ((_a = objetoUsuario.user) === null || _a === void 0 ? void 0 : _a.balance) !== undefined ? objetoUsuario.user.balance : (objetoUsuario.balance || 0);
+                const novoSaldo = Number(saldoAtual) - Number(valor);
                 if (objetoUsuario.user)
                     objetoUsuario.user.balance = novoSaldo;
                 else
                     objetoUsuario.balance = novoSaldo;
                 localStorage.setItem('usuarioLogado', JSON.stringify(objetoUsuario));
                 atualizarTela();
+                formPix.reset();
                 if (btnFecharPix)
                     btnFecharPix.click();
             }
             else {
-                alert('Erro ao realizar Pix: ' + (data.message || data.error));
+                alert('Erro ao realizar Pix: ' + (data.error || 'Erro desconhecido.'));
             }
         }
         catch (error) {
@@ -162,39 +166,104 @@ if (formPix) {
         }
     }));
 }
-// 9. Fetch: Deletar Conta
-const btnDeletarConta = document.getElementById('btnDeletarConta');
-if (btnDeletarConta) {
-    btnDeletarConta.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-        const confirmar = confirm("⚠️ ATENÇÃO: Tem a certeza absoluta que deseja APAGAR a sua conta?");
-        if (confirmar) {
-            const dadosSalvos = localStorage.getItem('usuarioLogado');
-            if (!dadosSalvos)
-                return;
-            const objetoUsuario = JSON.parse(dadosSalvos);
-            const token = objetoUsuario.token;
-            try {
-                const response = yield fetch(`http://localhost:3000/auth/deletar`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+// 6. Fetch: Carregar Extrato
+function carregarExtrato() {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        if (!listaTransacoes)
+            return;
+        const dadosSalvos = localStorage.getItem('usuarioLogado');
+        if (!dadosSalvos)
+            return;
+        const objetoUsuario = JSON.parse(dadosSalvos);
+        const token = objetoUsuario.token;
+        // ID do usuário logado — usado pra deduzir se cada transferência foi
+        // enviada ou recebida, já que o model Transfer não guarda um campo "type".
+        const currentUserId = ((_a = objetoUsuario.user) === null || _a === void 0 ? void 0 : _a.id) || objetoUsuario.id;
+        listaTransacoes.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Buscando transações...</p>';
+        try {
+            const response = yield fetch('http://localhost:3000/transfer/extrato', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = yield response.json();
+            // O backend responde na chave "transacoes" (pt-BR), não "transactions".
+            if (response.ok && data.transacoes && data.transacoes.length > 0) {
+                listaTransacoes.innerHTML = '';
+                data.transacoes.forEach((itemTransacao) => {
+                    var _a, _b;
+                    const itemElemento = document.createElement('div');
+                    itemElemento.className = 'flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-700/50';
+                    const isEnviado = itemTransacao.senderId === currentUserId;
+                    const rotulo = isEnviado ? 'Pix Enviado' : 'Pix Recebido';
+                    const contraparte = isEnviado
+                        ? (_a = itemTransacao.Receiver) === null || _a === void 0 ? void 0 : _a.name
+                        : (_b = itemTransacao.Sender) === null || _b === void 0 ? void 0 : _b.name;
+                    const corValor = isEnviado ? 'text-rose-400' : 'text-emerald-400';
+                    const sinal = isEnviado ? '-' : '+';
+                    const valor = Number(itemTransacao.amount);
+                    itemElemento.innerHTML = `
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-white">${rotulo}</p>
+                        <p class="text-[10px] text-slate-400">${contraparte ? (isEnviado ? 'para ' : 'de ') + contraparte : ''}</p>
+                        <p class="text-[10px] text-slate-500">${new Date(itemTransacao.createdAt).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black ${corValor}">${sinal} R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                `;
+                    listaTransacoes.appendChild(itemElemento);
                 });
-                const data = (yield response.json());
-                if (response.ok) {
-                    alert('Conta removida com sucesso.');
-                    localStorage.removeItem('usuarioLogado');
-                    window.location.href = '../index.html';
-                }
-                else {
-                    alert('Erro: ' + (data.message || 'Não autorizado.'));
-                }
             }
-            catch (error) {
-                alert('Erro de conexão com o servidor.');
+            else {
+                listaTransacoes.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Nenhuma movimentação recente encontrada.</p>';
             }
+        }
+        catch (error) {
+            listaTransacoes.innerHTML = '<p class="text-sm text-rose-400 text-center py-4">Erro ao carregar histórico.</p>';
+        }
+    });
+}
+// 7. Fetch: Deletar Conta
+if (btnConfig) {
+    btnConfig.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+        const confirmar = confirm('⚠️ Atenção: Você tem certeza absoluta que deseja deletar permanentemente a sua conta bancária?');
+        if (!confirmar)
+            return;
+        const dadosSalvos = localStorage.getItem('usuarioLogado');
+        if (!dadosSalvos)
+            return;
+        const token = JSON.parse(dadosSalvos).token;
+        try {
+            const response = yield fetch('http://localhost:3000/auth/deletar', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                alert('🚨 Conta encerrada com sucesso.');
+                localStorage.removeItem('usuarioLogado');
+                window.location.href = 'login.html';
+            }
+            else {
+                const data = yield response.json();
+                alert('Erro ao deletar conta: ' + (data.error || data.message));
+            }
+        }
+        catch (error) {
+            alert('Erro de conexão ao tentar deletar conta.');
         }
     }));
 }
-export {};
+// 8. Evento de Logout
+if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+        localStorage.removeItem('usuarioLogado');
+        window.location.href = 'login.html';
+    });
+}
+// Inicializa a tela ao carregar o arquivo
+atualizarTela();

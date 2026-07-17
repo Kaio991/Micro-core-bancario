@@ -4,187 +4,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Micro Core Bancário - Dashboard</title>
+    <title>Dashboard - Micro-core Bancário</title>
+    <!-- Tailwind CSS para estilização premium instantânea -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons para ícones modernos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .modal {
-            transition: opacity 0.25s ease;
-        }
-
+        /* Estilo para travar o scroll do body quando o modal estiver aberto */
         body.modal-active {
             overflow: hidden;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
         }
     </style>
 </head>
 
-<body class="bg-slate-900 text-white font-sans min-h-screen flex items-center justify-center">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans transition-all duration-300">
 
-    <!-- Container Principal -->
-    <div class="w-full max-w-md bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700 relative m-4">
-
-        <!-- Cabeçalho -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <p class="text-xs text-slate-400 tracking-wider uppercase font-semibold">Olá, bem-vindo!</p>
-                <h1 id="nomeUsuario" class="text-2xl font-bold text-emerald-400">Carregando...</h1>
+    <!-- Header Responsivo -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i data-lucide="wallet" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </div>
+                <span class="font-bold text-base md:text-lg tracking-wider text-indigo-400">MICRO-CORE</span>
             </div>
-            <!-- Botão Configurações (Deletar Conta) -->
-            <button id="btnConfig"
-                class="p-2 bg-slate-700 hover:bg-rose-600 rounded-xl transition-colors duration-200 group"
-                title="Deletar Conta">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-300 group-hover:text-white"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </button>
+            <div class="flex items-center gap-3 md:gap-4">
+                <span class="text-xs md:text-sm text-slate-400">Olá, <span id="nomeUsuario"
+                        class="text-slate-100 font-semibold">Usuário</span>!</span>
+                <button id="btnLogout"
+                    class="flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2.5 py-1.5 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-medium transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    Sair
+                </button>
+            </div>
         </div>
+    </header>
 
-        <!-- Card de Saldo -->
-        <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 mb-6">
-            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Saldo Disponível</p>
-            <p class="text-3xl font-black mt-1 text-white">R$ <span id="saldoUsuario">0,00</span></p>
-        </div>
+    <!-- Grid Principal Responsivo: 1 coluna no celular, 3 colunas no desktop -->
+    <main class="max-w-5xl mx-auto px-4 py-6 md:py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <!-- Grid de Ações -->
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <!-- Botão Pix -->
-            <button id="btnAbrirPix"
-                class="flex flex-col items-center justify-center p-4 bg-slate-700 hover:bg-slate-600 rounded-xl transition-all active:scale-95 border border-slate-600">
-                <div class="p-2 bg-emerald-500/10 rounded-lg mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+        <!-- LADO ESQUERDO: Saldo e Botões Rápidos (Ocupa 1 coluna no desktop) -->
+        <div class="md:col-span-1 flex flex-col gap-6">
+
+            <!-- Card de Saldo -->
+            <div
+                class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-5 md:p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-semibold tracking-widest text-slate-400 uppercase">Saldo Disponível</span>
+                    <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
                 </div>
-                <span class="text-xs font-semibold">Enviar Pix</span>
-            </button>
-
-            <!-- Botão Depositar -->
-            <button id="btnAbrirDeposito"
-                class="flex flex-col items-center justify-center p-4 bg-slate-700 hover:bg-slate-600 rounded-xl transition-all active:scale-95 border border-slate-600">
-                <div class="p-2 bg-amber-500/10 rounded-lg mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-slate-400 text-lg font-medium">R$</span>
+                    <!-- ID original do seu TS de volta aqui -->
+                    <span class="text-3xl md:text-4xl font-bold tracking-tight text-white" id="saldoUsuario">0,00</span>
                 </div>
-                <span class="text-xs font-semibold">Depositar</span>
-            </button>
+            </div>
 
-            <!-- Botão Extrato -->
-            <button id="btnAbrirExtrato"
-                class="flex flex-col items-center justify-center p-4 bg-slate-700 hover:bg-slate-600 rounded-xl transition-all active:scale-95 border border-slate-600">
-                <div class="p-2 bg-blue-500/10 rounded-lg mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
+            <!-- Card de Ações Rápidas -->
+            <div class="bg-slate-900/40 border border-slate-800/80 p-5 md:p-6 rounded-2xl">
+                <h2 class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-4">Ações da Conta</h2>
+                <div class="grid grid-cols-2 gap-3">
+
+                    <!-- Botão Depósito -->
+                    <button id="btnAbrirDeposito"
+                        class="flex flex-col items-center justify-center p-4 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition text-center gap-2 group">
+                        <div class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-lg group-hover:scale-110 transition">
+                            <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-300">Depositar</span>
+                    </button>
+
+                    <!-- Botão Pix -->
+                    <button id="btnAbrirPix"
+                        class="flex flex-col items-center justify-center p-4 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition text-center gap-2 group">
+                        <div class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-lg group-hover:scale-110 transition">
+                            <i data-lucide="qr-code" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-300">Enviar Pix</span>
+                    </button>
+
+                    <!-- Botão Extrato -->
+                    <button id="btnAbrirExtrato"
+                        class="flex flex-col items-center justify-center p-4 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition text-center gap-2 group">
+                        <div class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-lg group-hover:scale-110 transition">
+                            <i data-lucide="receipt" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-300">Extrato</span>
+                    </button>
+
+                    <!-- Botão Configurações (Deletar Conta) -->
+                    <button id="btnConfig"
+                        class="flex flex-col items-center justify-center p-4 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 rounded-xl transition text-center gap-2 group">
+                        <div class="p-2.5 bg-rose-500/10 text-rose-400 rounded-lg group-hover:scale-110 transition">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-xs font-medium text-rose-300">Excluir Conta</span>
+                    </button>
+
                 </div>
-                <span class="text-xs font-semibold">Ver Extrato</span>
-            </button>
+            </div>
+
         </div>
 
-        <!-- Logout -->
-        <div class="text-center">
-            <button id="btnLogout"
-                class="text-sm text-slate-400 hover:text-rose-400 font-medium transition-colors">Desconectar da
-                conta</button>
+        <!-- LADO DIREITO: Resumo Visual / Placeholder de Boas-Vindas (Ocupa 2 colunas no desktop) -->
+        <div class="md:col-span-2">
+            <div
+                class="bg-gradient-to-b from-slate-900/40 to-slate-950/20 border border-slate-800/80 rounded-2xl p-6 md:p-8 h-full flex flex-col justify-center items-center text-center">
+                <div
+                    class="w-16 h-16 bg-indigo-600/10 text-indigo-400 rounded-full flex items-center justify-center mb-4">
+                    <i data-lucide="sparkles" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-2">Área do Cliente Micro-core</h2>
+                <p class="text-sm text-slate-400 max-w-md">
+                    Faça depósitos para aumentar seu saldo, envie pagamentos via Pix de forma imediata e acompanhe tudo
+                    direto no seu extrato dinâmico.
+                </p>
+            </div>
         </div>
-    </div>
 
-    <!-- MODAL: DEPÓSITO -->
+    </main>
+
+    <!-- ==================== MODAIS DE AÇÕES ==================== -->
+
+    <!-- 1. Modal Depósito -->
     <div id="modalDeposito"
-        class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
-        <div class="modal-overlay absolute w-full h-full bg-slate-950/70 backdrop-blur-sm"></div>
-        <div
-            class="modal-container bg-slate-800 w-11/12 max-w-sm mx-auto rounded-2xl shadow-2xl z-50 border border-slate-700 p-6">
-            <h3 class="text-xl font-bold text-amber-400 mb-2">Fazer Depósito</h3>
-            <p class="text-xs text-slate-400 mb-4">Adicione saldo à sua conta corrente.</p>
-            <form id="formDeposito">
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Valor
-                        (R$)</label>
-                    <input type="number" id="valorDeposito" placeholder="0.00" step="0.01" min="0.01"
-                        class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-amber-500 font-bold text-lg"
-                        required />
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="arrow-down-left" class="text-emerald-400 w-5 h-5"></i>
+                    Depositar Dinheiro
+                </h3>
+                <button id="btnFecharDeposito" class="text-slate-400 hover:text-slate-200 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="formDeposito" class="flex flex-col gap-4">
+                <div>
+                    <label for="valorDeposito"
+                        class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor do
+                        Depósito (R$)</label>
+                    <input type="number" id="valorDeposito" step="0.01" min="0.01" required placeholder="0,00"
+                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-white outline-none transition">
                 </div>
-                <div class="flex space-x-3 mt-6">
-                    <button type="button" id="btnFecharDeposito"
-                        class="w-1/2 p-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold text-sm transition-colors">Cancelar</button>
-                    <button type="submit"
-                        class="w-1/2 p-3 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-bold text-sm transition-colors">Confirmar</button>
-                </div>
+                <button type="submit"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
+                    Confirmar Depósito
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: PIX -->
+    <!-- 2. Modal Pix -->
     <div id="modalPix"
-        class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
-        <div class="modal-overlay absolute w-full h-full bg-slate-950/70 backdrop-blur-sm"></div>
-        <div
-            class="modal-container bg-slate-800 w-11/12 max-w-sm mx-auto rounded-2xl shadow-2xl z-50 border border-slate-700 p-6">
-            <h3 class="text-xl font-bold text-emerald-400 mb-2">Enviar Pix</h3>
-            <p class="text-xs text-slate-400 mb-4">Transfira saldo instantaneamente para outra conta.</p>
-            <form id="formPix">
-                <div class="mb-3">
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">E-mail do
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="qr-code" class="text-indigo-400 w-5 h-5"></i>
+                    Enviar Transferência Pix
+                </h3>
+                <button id="btnFecharPix" class="text-slate-400 hover:text-slate-200 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="formPix" class="flex flex-col gap-4">
+                <div>
+                    <label for="destinatarioPix"
+                        class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail do
                         Destinatário</label>
-                    <input type="email" id="destinatarioPix" placeholder="exemplo@email.com"
-                        class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm"
-                        required />
+                    <input type="email" id="destinatarioPix" required placeholder="exemplo@email.com"
+                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-white outline-none transition text-sm">
                 </div>
-                <div class="mb-3">
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Valor
+                <div>
+                    <label for="valorPix"
+                        class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Valor
                         (R$)</label>
-                    <input type="number" id="valorPix" placeholder="0.00" step="0.01" min="0.01"
-                        class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 font-bold text-lg"
-                        required />
+                    <input type="number" id="valorPix" step="0.01" min="0.01" required placeholder="0,00"
+                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-white outline-none transition">
                 </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Senha
+                <div>
+                    <label for="senhaPix"
+                        class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Senha
                         Transacional (4 dígitos)</label>
-                    <input type="password" id="senhaPix" placeholder="****" maxlength="4"
-                        class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 tracking-widest font-mono text-center text-lg"
-                        required />
+                    <input type="password" id="senhaPix" maxlength="4" pattern="\d{4}" required placeholder="••••"
+                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-white outline-none transition text-center tracking-widest">
                 </div>
-                <div class="flex space-x-3 mt-6">
-                    <button type="button" id="btnFecharPix"
-                        class="w-1/2 p-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold text-sm transition-colors">Cancelar</button>
-                    <button type="submit"
-                        class="w-1/2 p-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl font-bold text-sm transition-colors">Confirmar
-                        Pix</button>
-                </div>
+                <button type="submit"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
+                    Enviar Pix
+                </button>
             </form>
         </div>
     </div>
 
+    <!-- 3. Modal Extrato -->
     <div id="modalExtrato"
-        class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
-        <div class="modal-overlay absolute w-full h-full bg-slate-950/70 backdrop-blur-sm"></div>
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
         <div
-            class="modal-container bg-slate-800 w-11/12 max-w-md mx-auto rounded-2xl shadow-2xl z-50 border border-slate-700 p-6 flex flex-col max-h-[80vh]">
-            <h3 class="text-xl font-bold text-blue-400 mb-1">Extrato da Conta</h3>
-            <p class="text-xs text-slate-400 mb-4">Histórico completo de transações.</p>
-
-          
-            <div id="listaTransacoes" class="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[200px] max-h-[400px]">
-                <p class="text-sm text-slate-400 text-center py-4">Nenhuma movimentação encontrada.</p>
+            class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center mb-5 flex-shrink-0">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i data-lucide="receipt" class="text-indigo-400 w-5 h-5"></i>
+                        Extrato Detalhado
+                    </h3>
+                    <p class="text-xs text-slate-400">Histórico completo de transações</p>
+                </div>
+                <button id="btnFecharExtrato" class="text-slate-400 hover:text-slate-200 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
             </div>
 
-            <div class="mt-6">
-                <button type="button" id="btnFecharExtrato"
-                    class="w-full p-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold text-sm transition-colors">Fechar
-                    Extrato</button>
+            <!-- Container com Scroll para as transações dinâmicas -->
+            <div class="overflow-y-auto pr-1 flex-grow custom-scrollbar" id="listaTransacoes">
+                <!-- O seu TS preenche essa div de forma dinâmica! -->
             </div>
         </div>
     </div>
 
-    
-    <script src="deshboard.js" defer></script>
+    <!-- Inicializador Lucide para carregar os ícones -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- Script compilado do TypeScript -->
+    <script src="./deshboard.js"></script>
 </body>
 
 </html>

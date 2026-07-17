@@ -18,14 +18,16 @@ interface TransferCreationAttributes extends Optional<TransferAttributes, 'id'> 
 
 
 class Transfer extends Model<TransferAttributes, TransferCreationAttributes> implements TransferAttributes {
-    public id!: string;
-    public senderId!: string;
-    public receiverId!: string;
-    public amount!: number;
-    public description!: string;
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-}
+    //  JEITO CERTO (Usando 'declare')
+    declare id: string;
+    declare senderId: string;
+    declare receiverId: string;
+    declare amount: number;
+    declare description: string;
+    declare createdAt: Date;
+    declare updatedAt: Date;
+    
+    }
 
 
 Transfer.init(

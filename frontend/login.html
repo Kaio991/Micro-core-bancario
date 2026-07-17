@@ -4,43 +4,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrar - PixApp</title>
-    
+    <title>Entrar - Micro-core Bancário</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+<body
+    class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between p-4 relative overflow-x-hidden">
 
-    <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
-        <h2 class="text-3xl font-bold text-center text-emerald-400 mb-2">PixApp</h2>
-        <p class="text-slate-400 text-center mb-6 text-sm">Acesse sua conta bancária</p>
+    <div id="toastContainer"
+        class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full px-4 md:px-0 pointer-events-none"></div>
 
-        
-        <form id="formLogin" class="space-y-4">
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">E-mail</label>
-                <input type="email" id="email" required placeholder="seu@email.com"
-                    class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-400 transition">
+    <header class="max-w-5xl w-full mx-auto py-4 flex justify-start items-center flex-shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                <i data-lucide="wallet" class="w-5 h-5"></i>
             </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Senha</label>
-                <input type="password" id="password" required placeholder="••••••••"
-                    class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-400 transition">
-            </div>
-
-            <button type="submit"
-                class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded-lg transition mt-6 shadow-lg shadow-emerald-500/20">
-                Entrar na Conta
-            </button>
-        </form>
-
-        <div class="text-center mt-6 text-sm text-slate-400">
-            Ainda não tem conta? <a href="cadastro.html" class="text-emerald-400 hover:underline">Cadastre-se</a>
+            <span class="font-bold text-base tracking-wider text-indigo-400">MICRO-CORE</span>
         </div>
-    </div>
+    </header>
 
-    
+    <main class="flex-grow flex items-center justify-center w-full my-8">
+        <div
+            class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-white tracking-tight">Acesse sua conta</h2>
+                <p class="text-xs text-slate-400 mt-1">Gerencie suas finanças no ecossistema Micro-core</p>
+            </div>
+
+            <form id="formLogin" class="flex flex-col gap-5">
+                <div>
+                    <label for="email"
+                        class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </span>
+                        <input type="email" id="email" required placeholder="seu@email.com"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-10 pr-4 py-3 text-white text-sm outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password"
+                        class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Senha</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                        </span>
+                        <input type="password" id="password" required placeholder="••••••••"
+                            class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-10 pr-4 py-3 text-white text-sm outline-none transition">
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-indigo-600/20 mt-2 flex items-center justify-center gap-2 group">
+                    Entrar na Conta
+                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-6 text-sm text-slate-400">
+                Ainda não tem conta? <a href="cadastro.html"
+                    class="text-indigo-400 hover:text-indigo-300 hover:underline transition">Cadastre-se</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-4 text-center text-xs text-slate-600 flex-shrink-0 border-t border-slate-900">
+        © 2026 Micro-core Bancário. Sistema seguro e criptografado.
+    </footer>
+
+    <script>
+        window.showToast = function (mensagem, tipo = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            // Transição suave de entrada
+            toast.className = `flex items-center gap-3 p-4 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+
+            if (tipo === 'success') {
+                toast.className += ' bg-slate-900 border-emerald-500/30 text-slate-100';
+                toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> <span class="text-sm font-medium">${mensagem}</span>`;
+            } else {
+                toast.className += ' bg-slate-900 border-rose-500/30 text-slate-100';
+                toast.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-rose-400 flex-shrink-0"></i> <span class="text-sm font-medium">${mensagem}</span>`;
+            }
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+
     <script>
         document.getElementById('formLogin').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -49,7 +117,6 @@
             const password = document.getElementById('password').value;
 
             try {
-                
                 const response = await fetch('http://localhost:3000/auth/login', {
                     method: 'POST',
                     headers: {
@@ -63,16 +130,25 @@
                 if (response.ok) {
                     localStorage.setItem('usuarioLogado', JSON.stringify(data));
 
-                    alert('Login realizado com sucesso!');
-                    window.location.href = './dashboard.html'; 
+                    // Toast de sucesso no lugar do alert!
+                    window.showToast('👋 Login realizado com sucesso! Redirecionando...', 'success');
+
+                    // Espera 1.5 segundos para o usuário ver o toast antes de redirecionar
+                    setTimeout(() => {
+                        window.location.href = './dashboard.html';
+                    }, 1500);
                 } else {
-                    alert('Erro ao entrar: ' + (data.error || data.message || 'Credenciais inválidas.'));
+                    // Toast de erro
+                    window.showToast(data.error || data.message || 'Credenciais inválidas.', 'error');
                 }
             } catch (error) {
                 console.error('Erro ao conectar com a API:', error);
-                alert('Erro ao conectar com o servidor back-end.');
+                window.showToast('⚠️ Erro ao conectar com o servidor back-end.', 'error');
             }
         });
+
+        // Inicializa os ícones do Lucide
+        lucide.createIcons();
     </script>
 </body>
 
