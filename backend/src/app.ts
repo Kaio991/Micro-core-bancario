@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'production') {
 // do funcionamento normal da API, só adiciona proteção.
 app.use(helmet());
 
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://127.0.0.1:5500,http://localhost:5500')
+const allowedOrigins = (process.env.CORS_ORIGIN || '*')
     .split(',')
     .map(origin => origin.trim());
 
