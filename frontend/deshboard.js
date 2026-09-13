@@ -77,7 +77,7 @@ if (formDeposito) {
         const objetoUsuario = JSON.parse(dadosSalvos);
         const token = objetoUsuario.token;
         try {
-            const response = yield fetch('http://localhost:3000/transfer/deposito', {
+            const response = yield fetch('https://micro-core-bancario-backend.onrender.com/transfer/deposito', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ if (formPix) {
         const objetoUsuario = JSON.parse(dadosSalvos);
         const token = objetoUsuario.token;
         try {
-            const response = yield fetch('http://localhost:3000/transfer/pix', {
+            const response = yield fetch('https://micro-core-bancario-backend.onrender.com/transfer/pix', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ function carregarExtrato() {
         const currentUserId = ((_a = objetoUsuario.user) === null || _a === void 0 ? void 0 : _a.id) || objetoUsuario.id;
         listaTransacoes.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Buscando transações...</p>';
         try {
-            const response = yield fetch('http://localhost:3000/transfer/extrato', {
+            const response = yield fetch('https://micro-core-bancario-backend.onrender.com/transfer/extrato', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -238,7 +238,7 @@ if (btnConfig) {
             return;
         const token = JSON.parse(dadosSalvos).token;
         try {
-            const response = yield fetch('http://localhost:3000/auth/deletar', {
+            const response = yield fetch('https://micro-core-bancario-backend.onrender.com/auth/deletar', {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

@@ -72,7 +72,7 @@ if (formDeposito) {
         const token = objetoUsuario.token;
 
         try {
-            const response = await fetch('http://localhost:3000/transfer/deposito', {
+            const response = await fetch('https://micro-core-bancario-backend.onrender.com/transfer/deposito', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ if (formPix) {
         const token = objetoUsuario.token;
 
         try {
-            const response = await fetch('http://localhost:3000/transfer/pix', {
+            const response = await fetch('https://micro-core-bancario-backend.onrender.com/transfer/pix', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ async function carregarExtrato(): Promise<void> {
     listaTransacoes.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Buscando transações...</p>';
 
     try {
-        const response = await fetch('http://localhost:3000/transfer/extrato', {
+        const response = await fetch('https://micro-core-bancario-backend.onrender.com/transfer/extrato', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -244,7 +244,7 @@ if (btnConfig) {
         const token = JSON.parse(dadosSalvos).token;
 
         try {
-            const response = await fetch('http://localhost:3000/auth/deletar', {
+            const response = await fetch('https://micro-core-bancario-backend.onrender.com/auth/deletar', {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
