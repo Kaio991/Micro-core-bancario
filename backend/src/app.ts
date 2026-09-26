@@ -29,7 +29,7 @@ app.use(cors({
 }));
 
 // Libera explicitamente as requisições de pré-voo (preflight OPTIONS)
-app.options('*', cors());
+//app.options('*', cors());
 
 app.use(express.json());
 
